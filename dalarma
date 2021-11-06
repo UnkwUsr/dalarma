@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# time in seconds
+DEFAULT_LOCK_TIME=15
+
+SUCCESS_EXIT_CODE=42
+WIN_CLASS="dalarma_win"
+
+
+TERMINAL_SCRIPT_KEYWORD=IS_TERMINAL_SCRIPT
+if [ "$1" = "$TERMINAL_SCRIPT_KEYWORD" ]; then
+    while true; do
+        time_remaining=$(( $LOCK_START-$(date +%s)+$LOCK_TIME ))
+        if (( $time_remaining <= 0 )); then
+            break
+        fi
+
+        clear
+        if [ -n "$TITLE" ]; then
+            echo "Alarma: $TITLE"
+        fi
+        echo "Lock time remaining: $time_remaining"
+        echo To close immediately, type:
+        echo "$TASK_SOLVE"
+
+        read inp
+        if [ "$inp" = "$TASK_SOLVE" ]; then
+            break
+        fi
+    done
+
+    exit $SUCCESS_EXIT_CODE
+fi
+
+
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 number[s|m|h|d] [text]"
+    echo "More info about [s|m|h|d] see in 'man sleep'"
+    notify-send -u critical "can't start dalarma"
+
+    exit 1
+fi
+
+sleep_time=$1
+export TITLE="${@:2}"
+
+# TODO: there should be flag detection and setting custom lock time
+export LOCK_TIME=$DEFAULT_LOCK_TIME
+
+notify-send -t 1000 "dalarma started for $sleep_time" "$TITLE"
+
+sleep $sleep_time
+
+# preparation for lock program
+export TASK_SOLVE=$(date +%N | md5sum | head -c 10)
+export LOCK_START=$(date +%s)
+(sleep $LOCK_TIME && notify-send -u critical "dalarma break done") &
+
+# pre lock
+notify-send -u critical "$TITLE"
+ponymix is-muted
+IS_WAS_MUTED=$?
+ponymix mute > /dev/null
+playerctl -a pause 2> /dev/null
+
+# TODO: write to file /tmp/dalarmas/<pid> information such time start and
+# name+content of current dalarma, so later we can write script to display list
+# of running alarmas and select one to kill
+
+i3-msg -t subscribe '[ "window" ]' -m | while read -r line; do \
+    i3-msg "[class=$WIN_CLASS] sticky enable, floating enable, fullscreen enable"; \
+done > /dev/null &
+PID_I3MSG=$!
+
+# lock
+while true; do
+    EXIT_STRING=$(st -c "$WIN_CLASS" -f "Hack:pixelsize=50:antialias=true:autohint=true" \
+        -e zsh -c "dalarma $TERMINAL_SCRIPT_KEYWORD" 2>&1)
+
+    if [ "$EXIT_STRING" = "child exited with status $SUCCESS_EXIT_CODE" ]; then
+        break
+    fi
+done
+
+# post lock
+kill $PID_I3MSG
+test $IS_WAS_MUTED -ne 0 && ponymix unmute
+dunstctl close-all
