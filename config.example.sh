@@ -1,3 +1,6 @@
+# lock time in seconds
+LOCK_TIME=15
+
 cmd_pre_lock() {
     # we can set variable there and later use it in cmd_post_lock
     ponymix is-muted; IS_WAS_MUTED=$?

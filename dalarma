@@ -2,9 +2,6 @@
 
 source ~/.config/dalarma/config.sh
 
-# time in seconds
-DEFAULT_LOCK_TIME=15
-
 SUCCESS_EXIT_CODE=42
 WIN_CLASS="dalarma_win"
 
@@ -48,7 +45,8 @@ sleep_time=$1
 export TITLE="${@:2}"
 
 # TODO: there should be flag detection and setting custom lock time
-export LOCK_TIME=$DEFAULT_LOCK_TIME
+# default 15 if not set in config
+export LOCK_TIME=${LOCK_TIME:-15}
 
 notify-send -t 1000 "dalarma started for $sleep_time" "$TITLE"
 
