@@ -55,7 +55,9 @@ sleep $sleep_time
 # preparation for lock program
 export TASK_SOLVE=$(date +%N | md5sum | head -c 10)
 export LOCK_START=$(date +%s)
+
 (sleep $LOCK_TIME && notify-send -u critical "dalarma break done") &
+PID_NOTIFY_BREAK_DONE=$!
 
 # pre lock
 notify-send -u critical "$TITLE"
@@ -85,5 +87,6 @@ done
 
 # post lock
 kill $PID_I3MSG
+kill $PID_NOTIFY_BREAK_DONE 2> /dev/null
 test $IS_WAS_MUTED -ne 0 && ponymix unmute
 dunstctl close-all
