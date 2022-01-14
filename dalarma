@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ~/.config/dalarma/config.sh
+
 # time in seconds
 DEFAULT_LOCK_TIME=15
 
@@ -62,10 +64,7 @@ PID_NOTIFY_BREAK_DONE=$!
 
 # pre lock
 notify-send -u critical "dalarma" "$TITLE"
-ponymix is-muted
-IS_WAS_MUTED=$?
-ponymix mute > /dev/null
-playerctl -a pause 2> /dev/null
+cmd_pre_lock
 
 # TODO: write to file /tmp/dalarmas/<pid> information such time start and
 # name+content of current dalarma, so later we can write script to display list
@@ -89,5 +88,5 @@ done
 # post lock
 kill $PID_I3MSG
 kill $PID_NOTIFY_BREAK_DONE 2> /dev/null
-test $IS_WAS_MUTED -ne 0 && ponymix unmute
 dunstctl close-all
+cmd_post_lock
