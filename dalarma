@@ -61,7 +61,7 @@ export LOCK_START=$(date +%s)
 PID_NOTIFY_BREAK_DONE=$!
 
 # pre lock
-notify-send -u critical "$TITLE"
+notify-send -u critical "dalarma" "$TITLE"
 ponymix is-muted
 IS_WAS_MUTED=$?
 ponymix mute > /dev/null
