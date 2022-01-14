@@ -20,10 +20,10 @@ if [ "$1" = "$TERMINAL_SCRIPT_KEYWORD" ]; then
             echo "Alarma: $TITLE"
         fi
         echo "Lock time remaining: $time_remaining"
-        echo To close immediately, type:
-        echo "$TASK_SOLVE"
+        echo "To close immediately, solve next task:"
+        echo "$TASK_TEXT"
 
-        read inp
+        read -p "Answer: " inp
         if [ "$inp" = "$TASK_SOLVE" ]; then
             break
         fi
@@ -54,6 +54,7 @@ sleep $sleep_time
 
 # preparation for lock program
 export TASK_SOLVE=$(date +%N | md5sum | head -c 10)
+export TASK_TEXT="Type '$TASK_SOLVE'"
 export LOCK_START=$(date +%s)
 
 (sleep $LOCK_TIME && notify-send -u critical "dalarma break done") &
