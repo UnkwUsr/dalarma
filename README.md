@@ -29,9 +29,14 @@ dalarma 5m drink water
 ```
 
 ## Configuration
-`~/.config/dalarma/config.sh` is just a shell script that executes on start of
-`dalarma` (so it can be very hackable and extensible). As interesting feature,
-you can execute your own commands before and after lock (like mute/unmute all sounds,
-etc.) with `cmd_pre_lock` and `cmd_post_lock`.
+
+`~/.config/dalarma/config.sh` is just a shell script, so it can be very
+hackable and extensible.
+
+As interesting feature, you can execute your own commands before and after lock
+(like mute/unmute all sounds, etc.) with `cmd_pre_lock` and `cmd_post_lock`.
+
+You can edit it even after some timers have started and they will use updated
+config (for example, edit pre and post hooks).
 
 Self-explanatory [config example](./config.example.sh) provided.

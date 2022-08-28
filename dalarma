@@ -60,6 +60,10 @@ export LOCK_START=$(date +%s)
 (sleep $LOCK_TIME && notify-send -u critical "dalarma break done") &
 PID_NOTIFY_BREAK_DONE=$!
 
+# re-read config one time again, just for the case when you edited config
+# after creating dalarma timer
+source ~/.config/dalarma/config.sh
+
 # pre lock
 notify-send -u critical "dalarma" "$TITLE"
 cmd_pre_lock
