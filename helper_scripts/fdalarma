@@ -1,0 +1,89 @@
+#!/bin/bash
+#
+# script to manage dalarma timers with fzf. It parses current running alarmas
+# from /tmp/dalarma/ and opens them in fzf
+#
+# keys:
+# * enter - edit timer (open in vim)
+# * ctrl-d - remove timer
+#
+# shellcheck disable=1090 # non-constant `source "somefile"`
+
+DALARMAS_PATH="/tmp/dalarma/"
+# exporting to use from fzf
+export DALARMAS_PATH
+
+# convert sleep duration format to seconds. By
+# https://stackoverflow.com/a/50435058/17940925
+t2s() {
+   sed 's/d/*24*3600 +/g; s/h/*3600 +/g; s/m/*60 +/g; s/s/\+/g; s/+[ ]*$//g' <<< "$1" | bc
+}
+
+calc_remaining_min() {
+    sleep_time="$1"
+    started_at="$2"
+
+    sleep_secs=$(t2s "$sleep_time")
+    start_secs=$(date +%s -ud "1970-01-01 $started_at")
+    end_secs=$((start_secs + sleep_secs))
+
+    now_secs=$(date +%s -ud "1970-01-01 $(date +%T)")
+
+    echo $(((end_secs - now_secs) / 60))
+}
+
+format_lines() {
+    for pid in $pids; do
+        # `source` exposes next variables: (to suppress shellcheck warning)
+        declare title started_at sleep_time
+        source "$DALARMAS_PATH/$pid"
+
+        remaining_min=$(calc_remaining_min "$sleep_time" "$started_at")
+
+        echo "$pid $started_at +${remaining_min}m ($sleep_time) $title"
+    done
+}
+
+#### functions to be exposed to fzf
+
+# shellcheck disable=2317 # unused function. Actually used in fzf
+edit_pid() {
+    pid="$1"
+
+    # `source` exposes next variables: (to suppress shellcheck warning)
+    declare title started_at sleep_time
+    source "$DALARMAS_PATH/$pid"
+
+    remaining_min=$(calc_remaining_min "$sleep_time" "$started_at")
+
+    editfile="$DALARMAS_PATH/editing"
+    {
+        echo "dalarma ${remaining_min}m $title"
+        echo "# was started at $started_at"
+        echo "# had to wait $sleep_time"
+    } > "$editfile"
+    vim "$editfile"
+    (nohup sh "$editfile" &> /dev/null) & delete_pid "$pid"
+    # TODO: idk should we remove $editfile . It's hard
+}
+export -f edit_pid
+# also export helper functions
+export -f calc_remaining_min t2s
+
+# shellcheck disable=2317 # unused function. Actually used in fzf
+delete_pid() {
+    pid="$1"
+
+    kill "$(basename "$pid")"
+    rm "$DALARMAS_PATH/$pid"
+}
+export -f delete_pid
+
+####
+
+pids=$(pgrep -x dalarma)
+
+format_lines "$pids" \
+    | SHELL=bash fzf --with-nth 2.. \
+    --bind "enter:execute(edit_pid {1})+become($0)" \
+    --bind "ctrl-d:execute(delete_pid {1})+become($0)"
