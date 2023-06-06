@@ -4,6 +4,7 @@ source ~/.config/dalarma/config.sh
 
 SUCCESS_EXIT_CODE=42
 WIN_CLASS="dalarma_win"
+DALARMAS_PATH="/tmp/dalarma/"
 
 
 TERMINAL_SCRIPT_KEYWORD=IS_TERMINAL_SCRIPT
@@ -50,6 +51,16 @@ export LOCK_TIME=${LOCK_TIME:-15}
 
 notify-send -t 1000 "dalarma started for $sleep_time" "$TITLE"
 
+# store meta info to be used by external programs
+mkdir -p "$DALARMAS_PATH"
+cur_dalarma_tmp="$DALARMAS_PATH/$$"
+echo "
+    started_at=\"$(date '+%H:%M')\"
+    sleep_time=\"$sleep_time\"
+    title=\"$TITLE\"
+" > "$cur_dalarma_tmp"
+
+
 sleep $sleep_time
 
 # preparation for lock program
@@ -67,10 +78,6 @@ source ~/.config/dalarma/config.sh
 # pre lock
 notify-send -u critical "dalarma" "$TITLE"
 cmd_pre_lock
-
-# TODO: write to file /tmp/dalarmas/<pid> information such time start and
-# name+content of current dalarma, so later we can write script to display list
-# of running alarmas and select one to kill
 
 i3-msg -t subscribe '[ "window" ]' -m | while read -r line; do \
     i3-msg "[class=$WIN_CLASS] sticky enable, floating enable, fullscreen enable"; \
@@ -90,5 +97,7 @@ done
 # post lock
 kill $PID_I3MSG
 kill $PID_NOTIFY_BREAK_DONE 2> /dev/null
+# remove meta info file for current alarma
+rm "$cur_dalarma_tmp"
 dunstctl close-all
 cmd_post_lock
