@@ -30,6 +30,15 @@ All remaining arguments will be used as title for your timer.
 dalarma 5m drink water
 ```
 
+### Managing timers
+
+`dalarma` puts each new timer metadata to `/tmp/dalarma/` folder, one per file.
+File name is pid of timer process, and file itself contains metadata about this
+timer, such as `started_at`, `sleep_time` and `title`.
+
+There is [script](./helper_scripts/fdalarma) that also utilizes fzf for ui. You
+can take inspiration from it.
+
 ## Configuration
 
 `~/.config/dalarma/config.sh` is just a shell script, so it can be very
