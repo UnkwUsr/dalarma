@@ -15,8 +15,9 @@ export DALARMAS_PATH
 
 # convert sleep duration format to seconds. By
 # https://stackoverflow.com/a/50435058/17940925
+# (modified)
 t2s() {
-   sed 's/d/*24*3600 +/g; s/h/*3600 +/g; s/m/*60 +/g; s/s/\+/g; s/+[ ]*$//g' <<< "$1" | bc
+    printf "%.0f" "$(sed 's/d/*24*3600 +/g; s/h/*3600 +/g; s/m/*60 +/g; s/s/\+/g; s/+[ ]*$//g' <<< "$1" | bc)"
 }
 
 calc_remaining_min() {
