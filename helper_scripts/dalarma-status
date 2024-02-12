@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# simply prints earliest timer (the timer which will trigger first, if there is
+# multiple). Useful for putting in statusbar to always know is there any timers
+# and when it will trigger. Output format: "{remaining_time} {title}"
+#
+# shellcheck disable=1090 # non-constant `source "somefile"`
+
+source "$(dirname "$(realpath "$0")")"/utils.sh
+
+get_timers_formatted() {
+    pids=$(pgrep -x dalarma)
+    for pid in $pids; do
+        # `source` exposes next variables: (to suppress shellcheck warning)
+        declare title started_at sleep_time
+        source "$DALARMAS_PATH/$pid"
+
+        remaining_min=$(calc_remaining_min "$sleep_time" "$started_at")
+
+        echo "${remaining_min}m $title"
+    done
+}
+
+find_earliest() {
+    get_timers_formatted | sort -nrk1,1 | tail -n1
+}
+
+find_earliest
