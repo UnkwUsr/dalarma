@@ -36,12 +36,12 @@ calc_remaining_min() {
 format_lines() {
     for pid in $pids; do
         # `source` exposes next variables: (to suppress shellcheck warning)
-        declare title started_at sleep_time
+        declare title started_at sleep_time raw_user_sleep_time
         source "$DALARMAS_PATH/$pid"
 
         remaining_min=$(calc_remaining_min "$sleep_time" "$started_at")
 
-        echo "$pid $started_at +${remaining_min}m ($sleep_time) $title"
+        echo "$pid $started_at +${remaining_min}m ($raw_user_sleep_time) $title"
     done
 }
 
@@ -52,7 +52,7 @@ edit_pid() {
     pid="$1"
 
     # `source` exposes next variables: (to suppress shellcheck warning)
-    declare title started_at sleep_time
+    declare title started_at sleep_time raw_user_sleep_time
     source "$DALARMAS_PATH/$pid"
 
     remaining_min=$(calc_remaining_min "$sleep_time" "$started_at")

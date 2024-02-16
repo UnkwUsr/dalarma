@@ -6,6 +6,20 @@ SUCCESS_EXIT_CODE=42
 WIN_CLASS="dalarma_win"
 DALARMAS_PATH="/tmp/dalarma/"
 
+delta_from_now() {
+    given_time=$(date -d "$1" +%s)
+    current_time=$(date +%s)
+    delta_seconds=$((given_time - current_time))
+    echo "${delta_seconds}s"
+}
+
+parse_time() {
+    if [[ "$1" == *":"* ]]; then
+        delta_from_now "$1"
+    else
+        echo "$1"
+    fi
+}
 
 TERMINAL_SCRIPT_KEYWORD=IS_TERMINAL_SCRIPT
 if [ "$1" = "$TERMINAL_SCRIPT_KEYWORD" ]; then
@@ -42,14 +56,16 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-sleep_time=$1
+raw_user_sleep_time=$1
 export TITLE="${@:2}"
 
 # TODO: there should be flag detection and setting custom lock time
 # default 15 if not set in config
 export LOCK_TIME=${LOCK_TIME:-15}
 
-notify-send -t 1000 "dalarma started for $sleep_time" "$TITLE"
+notify-send -t 1000 "dalarma started for $raw_user_sleep_time" "$TITLE"
+
+sleep_time=$(parse_time "$raw_user_sleep_time")
 
 # store meta info to be used by external programs
 mkdir -p "$DALARMAS_PATH"
@@ -57,11 +73,11 @@ cur_dalarma_tmp="$DALARMAS_PATH/$$"
 echo "
     started_at=\"$(date '+%H:%M')\"
     sleep_time=\"$sleep_time\"
+    raw_user_sleep_time=\"$raw_user_sleep_time\"
     title=\"$TITLE\"
 " > "$cur_dalarma_tmp"
 
-
-sleep $sleep_time
+sleep "$sleep_time"
 
 # preparation for lock program
 export TASK_SOLVE=$(date +%N | md5sum | head -c 10)
