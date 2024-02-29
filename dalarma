@@ -109,7 +109,7 @@ PID_LOCKWIN_LOOP=$!
 # lock
 while true; do
     EXIT_STRING=$(st -t "$WIN_TITLE" -f "Hack:pixelsize=50:antialias=true:autohint=true" \
-        -e zsh -c "dalarma $TERMINAL_SCRIPT_KEYWORD" 2>&1)
+        -e sh -c "dalarma $TERMINAL_SCRIPT_KEYWORD" 2>&1)
 
     if [ "$EXIT_STRING" = "child exited with status $SUCCESS_EXIT_CODE" ]; then
         break
