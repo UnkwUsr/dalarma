@@ -3,7 +3,7 @@
 source ~/.config/dalarma/config.sh
 
 SUCCESS_EXIT_CODE=42
-WIN_CLASS="dalarma_win"
+WIN_TITLE="dalarma_win"
 DALARMAS_PATH="/tmp/dalarma/"
 
 delta_from_now() {
@@ -95,14 +95,20 @@ source ~/.config/dalarma/config.sh
 notify-send -u critical "dalarma" "$TITLE"
 cmd_pre_lock
 
-i3-msg -t subscribe '[ "window" ]' -m | while read -r line; do \
-    i3-msg "[class=$WIN_CLASS] sticky enable, floating enable, fullscreen enable"; \
-done > /dev/null &
-PID_I3MSG=$!
+# force focus and make fullscreen our "window"
+# initial little sleep is hack to make window fullscreen as soon as possible
+# (idea is in that this background loop will start already after terminal
+# window started)
+(sleep 0.1 && while true; do
+    wmctrl -r "$WIN_TITLE" -b add,fullscreen
+    wmctrl -a "$WIN_TITLE"
+    sleep 1
+done) &
+PID_LOCKWIN_LOOP=$!
 
 # lock
 while true; do
-    EXIT_STRING=$(st -c "$WIN_CLASS" -f "Hack:pixelsize=50:antialias=true:autohint=true" \
+    EXIT_STRING=$(st -t "$WIN_TITLE" -f "Hack:pixelsize=50:antialias=true:autohint=true" \
         -e zsh -c "dalarma $TERMINAL_SCRIPT_KEYWORD" 2>&1)
 
     if [ "$EXIT_STRING" = "child exited with status $SUCCESS_EXIT_CODE" ]; then
@@ -111,7 +117,7 @@ while true; do
 done
 
 # post lock
-kill $PID_I3MSG
+kill $PID_LOCKWIN_LOOP
 kill $PID_NOTIFY_BREAK_DONE 2> /dev/null
 # remove meta info file for current alarma
 rm "$cur_dalarma_tmp"
