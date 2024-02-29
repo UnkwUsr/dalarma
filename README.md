@@ -42,10 +42,17 @@ Format is the same as for `sleep`, so go to `man sleep` for details. In short:
 there is available suffixes like `s`, `m`, `h` for seconds, minutes and hours
 respectively.
 
+Additionally, first argument time can be set in format `hh:mm` to set timer ON
+TIME, not by offset.
+
 All remaining arguments will be used as title for your timer.
 
 ```
-dalarma 5m drink water
+dalarma 30m check oven
+```
+
+```
+dalarma 14:20 time to depart
 ```
 
 ### Managing timers
