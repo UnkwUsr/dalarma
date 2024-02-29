@@ -23,11 +23,11 @@ happen with your food in oven...
 
 ## Requirements
 
-* `i3wm` (because of `i3-msg`) - window manager (thanks to `i3-msg`'s feature
-  to monitor windows events and set fullscreen and sticky mode from cli).
-  Possible can be dropped by using `wmctrl`.
-* `st` (possible alternatives) - simple/suckless terminal, it used as gui that
-  block screen.
+* `wmctrl` (partially optional) - used to make window fullscreen and auto-focus
+  each second to make window harder to close. Hence, it is core functionality,
+  but still, `dalarma` can work without it.
+* `st` - simple/suckless terminal emulator, used as gui window that blocks
+  screen.
 * `notify-send` (optional) - for sending notifies visible on blocked screen.
 
 ## Installation
