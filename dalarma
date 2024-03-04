@@ -6,6 +6,11 @@ SUCCESS_EXIT_CODE=42
 WIN_TITLE="dalarma_win"
 DALARMAS_PATH="/tmp/dalarma/"
 
+if ! command -v "st" &> /dev/null; then
+    echo "\`st\` is not found. It is mandatory dependency, please install it"
+    exit 1
+fi
+
 delta_from_now() {
     given_time=$(date -d "$1" +%s)
     current_time=$(date +%s)
@@ -95,16 +100,20 @@ source ~/.config/dalarma/config.sh
 notify-send -u critical "dalarma" "$TITLE"
 cmd_pre_lock
 
-# force focus and make fullscreen our "window"
-# initial little sleep is hack to make window fullscreen as soon as possible
-# (idea is in that this background loop will start already after terminal
-# window started)
-(sleep 0.1 && while true; do
-    wmctrl -r "$WIN_TITLE" -b add,fullscreen
-    wmctrl -a "$WIN_TITLE"
-    sleep 1
-done) &
-PID_LOCKWIN_LOOP=$!
+if ! command -v "wmctrl" &> /dev/null; then
+    echo "\`wmctrl\` is not found. Some functionality is disabled"
+else
+    # force focus and make fullscreen our "window"
+    # `sleep 0.1` is little hack to make window fullscreen as soon as possible
+    # (idea is in that this background loop will start already after terminal
+    # window started)
+    (sleep 0.1 && while true; do
+        wmctrl -r "$WIN_TITLE" -b add,fullscreen
+        wmctrl -a "$WIN_TITLE"
+        sleep 1
+    done) &
+    PID_LOCKWIN_LOOP=$!
+fi
 
 # lock
 while true; do
@@ -117,7 +126,7 @@ while true; do
 done
 
 # post lock
-kill $PID_LOCKWIN_LOOP
+[ -n "${PID_LOCKWIN_LOOP+x}" ] && kill "$PID_LOCKWIN_LOOP"
 kill $PID_NOTIFY_BREAK_DONE 2> /dev/null
 # remove meta info file for current alarma
 rm "$cur_dalarma_tmp"
