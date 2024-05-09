@@ -8,8 +8,10 @@
 # * ctrl-d - remove timer
 #
 # shellcheck disable=1090 # non-constant `source "somefile"`
+# shellcheck disable=1091 # following file: does not exist
 
-source "$(dirname "$(realpath "$0")")"/utils.sh
+script_root=$(dirname "$(realpath "$0")")/../share/dalarma
+source "$script_root"/utils.sh
 
 format_lines() {
     for pid in $pids; do
