@@ -1,10 +1,19 @@
 #!/bin/bash
+#
+# shellcheck disable=1090 # non-constant `source "somefile"`
+# shellcheck disable=1091 # following file: does not exist
+# shellcheck disable=2155 # declare and assign separately
 
-source ~/.config/dalarma/config.sh
+script_root=$(dirname "$(realpath "$0")")/../share/dalarma
+source "$script_root"/utils.sh
 
 SUCCESS_EXIT_CODE=42
 WIN_TITLE="dalarma_win"
 DALARMAS_PATH="/tmp/dalarma/"
+
+source ~/.config/dalarma/config.sh
+# default 15 if not set in config
+DEFAULT_LOCK_TIME="${DEFAULT_LOCK_TIME:-15}"
 
 if ! command -v "st" &> /dev/null; then
     echo "\`st\` is not found. It is mandatory dependency, please install it"
@@ -64,10 +73,7 @@ fi
 raw_user_sleep_time=$1
 export TITLE="${@:2}"
 
-# TODO: there should be flag detection and setting custom lock time
-# default 15 if not set in config
-export LOCK_TIME=${LOCK_TIME:-15}
-
+export LOCK_TIME="$(t2s "${LOCK_TIME:-$DEFAULT_LOCK_TIME}")"
 notify-send -t 1000 "dalarma started for $raw_user_sleep_time" "$TITLE"
 
 sleep_time=$(parse_time "$raw_user_sleep_time")

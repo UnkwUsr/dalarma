@@ -1,5 +1,5 @@
 # lock time in seconds
-LOCK_TIME=15
+DEFAULT_LOCK_TIME=15
 
 # this function will run before locking
 cmd_pre_lock() {

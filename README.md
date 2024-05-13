@@ -64,6 +64,16 @@ timer, such as `started_at`, `sleep_time` and `title`.
 There is [script](./helper_scripts/fdalarma) that also utilizes fzf for ui. You
 can take inspiration from it.
 
+### Custom lock time
+
+You can override lock time of each timer. To do so:
+
+```sh
+LOCK_TIME=5m dalarma "really its very important"
+```
+
+TODO: ugh ogh. We need also update fdalarma and some stuff
+
 ## Configuration
 
 `~/.config/dalarma/config.sh` is just a shell script, so it can be very
