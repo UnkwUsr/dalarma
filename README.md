@@ -19,7 +19,7 @@ you actually getting training yourself to automatically/mindlessly
 postpone/skip another one timer alarm, thinking like "ahgh, I'm almost finished
 this fancy algorithm, let me just done it in 2 minutes and I'll check these
 oven", which can result in many postpones in a row, so you know what will
-happen with your food in oven...
+happen with your food...
 
 ## Requirements
 
@@ -45,7 +45,7 @@ respectively.
 Additionally, first argument time can be set in format `hh:mm` to set timer ON
 TIME, not by offset.
 
-All remaining arguments will be used as title for your timer.
+All remaining arguments will be used as title for your timer (can be ommited).
 
 ```
 dalarma 30m check oven
