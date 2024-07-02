@@ -32,8 +32,15 @@ happen with your food...
 
 ## Installation
 
-Just copy [./dalarma](./dalarma) somewhere to your `~/.local/bin/` and
-[./config.example.sh](./config.example.sh) to `~/.config/dalarma/config.sh`.
+### On Arch Linux
+
+AUR package: [dalarma-git](https://aur.archlinux.org/packages/dalarma-git/)
+
+### Manual
+
+Copy [./dalarma](./dalarma) somewhere to your `$PATH` (like `~/.local/bin/` or
+`/usr/bin/`) and optionally [./config.example.sh](./config.example.sh) to
+`~/.config/dalarma/config.sh`.
 
 ## Usage
 
