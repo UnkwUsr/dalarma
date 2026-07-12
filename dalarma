@@ -132,5 +132,7 @@ done
 kill $PID_NOTIFY_BREAK_DONE 2> /dev/null
 # remove meta info file for current alarma
 rm "$cur_dalarma_tmp"
-dunstctl close-all
+if command -v dunstctl &>/dev/null; then
+    dunstctl close-all
+fi
 cmd_post_lock
