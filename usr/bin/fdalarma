@@ -61,8 +61,8 @@ export -f delete_pid
 ####
 
 pids=$(pgrep -x dalarma)
-
-format_lines "$pids" \
+# sort by time remaining
+format_lines "$pids" | sort -k3.3n \
     | SHELL=bash fzf --with-nth 2.. \
     --bind "enter:execute(edit_pid {1})+become($0)" \
     --bind "ctrl-d:execute(delete_pid {1})+become($0)"
