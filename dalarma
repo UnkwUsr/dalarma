@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source ~/.config/dalarma/config.sh
+# stub define functions which expected to be in config file
+cmd_pre_lock() { :; }; cmd_post_lock() { :; }
+[ -f "${CONFIG_FILE:=$HOME/.config/dalarma/config.sh}" ] && source "$CONFIG_FILE"
 
 SUCCESS_EXIT_CODE=42
 WIN_TITLE="dalarma_win"
@@ -94,7 +96,7 @@ PID_NOTIFY_BREAK_DONE=$!
 
 # re-read config one time again, just for the case when you edited config
 # after creating dalarma timer
-source ~/.config/dalarma/config.sh
+[ -f "$CONFIG_FILE" ] && source "$CONFIG_FILE"
 
 # pre lock
 notify-send -u critical "dalarma" "$TITLE"
